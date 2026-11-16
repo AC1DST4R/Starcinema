@@ -2,315 +2,88 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#08090c">
 <title>ST4R Cinema</title>
 <style>
-:root {
-  color-scheme: dark;
-  --bg:#08090c;
-  --panel:#111318;
-  --panel2:#191c23;
-  --text:#f5f5f7;
-  --muted:#9297a3;
-  --border:rgba(255,255,255,.09);
-}
-* { box-sizing:border-box }
-body {
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-}
-button,input,select { font:inherit }
-button {
-  cursor:pointer;
-  border:1px solid var(--border);
-  border-radius:9px;
-  padding:10px 15px;
-  color:var(--text);
-  background:var(--panel2);
-  transition:.2s;
-}
-button:hover { background:#292d36 }
-button.primary {
-  color:#090a0d;
-  background:#f4f4f5;
-  border-color:#f4f4f5;
-  font-weight:700;
-}
-button.primary:hover { background:#d6d6dc }
-button.danger { color:#ff7777 }
-header {
-  height:68px;
-  padding:0 5%;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  position:sticky;
-  top:0;
-  z-index:20;
-  background:rgba(8,9,12,.88);
-  backdrop-filter:blur(22px);
-  border-bottom:1px solid var(--border);
-}
-.brand { font-size:21px;font-weight:800;letter-spacing:-1px }
-.brand span { color:#a3a8b4 }
-.header-actions { display:flex;gap:9px;flex-wrap:wrap }
-main { max-width:1600px;margin:auto;padding:0 5% 70px }
-.hero {
-  min-height:390px;
-  margin:28px 0 38px;
-  border-radius:18px;
-  overflow:hidden;
-  position:relative;
-  display:flex;
-  align-items:end;
-  background:linear-gradient(120deg,#171a22,#08090c 75%);
-  border:1px solid var(--border);
-}
-.hero-image {
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  opacity:.48;
-  mask-image:linear-gradient(to right,black,transparent 100%);
-}
-.hero::after {
-  content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(0deg,#08090c 0%,transparent 80%);
-}
-.hero-content { z-index:1;padding:40px;max-width:650px }
-.eyebrow {
-  color:#b3b7c1;
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:3px;
-}
-.hero h1 { font-size:clamp(35px,6vw,65px);letter-spacing:-3px;margin:12px 0 }
-.hero p { color:#c2c5ce;line-height:1.6 }
-.section-heading {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin:28px 0 17px;
-}
-.section-heading h2 { font-size:21px;margin:0 }
-.muted { color:var(--muted);font-size:13px }
-.toolbar {
-  display:flex;
-  gap:10px;
-  align-items:center;
-  flex-wrap:wrap;
-  margin:24px 0;
-}
-.toolbar input,.toolbar select,.field input {
-  color:var(--text);
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:9px;
-  padding:11px 13px;
-  outline:none;
-}
-.toolbar input { flex:1;min-width:180px }
-.toolbar input:focus,.field input:focus { border-color:#777e8c }
-.grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(155px,1fr));
-  gap:24px 16px;
-}
-.movie-card { min-width:0;cursor:pointer }
-.poster {
-  position:relative;
-  aspect-ratio:2/3;
-  overflow:hidden;
-  border-radius:11px;
-  background:linear-gradient(145deg,#20232b,#101116);
-  border:1px solid var(--border);
-}
-.poster img {
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-  opacity:0;
-  transition:opacity .35s,transform .35s;
-}
-.poster img.loaded { opacity:1 }
-.movie-card:hover .poster img { transform:scale(1.045) }
-.poster-placeholder {
-  position:absolute;
-  inset:0;
-  display:grid;
-  place-items:center;
-  padding:15px;
-  text-align:center;
-  color:#777e8c;
-  font-size:14px;
-  font-weight:700;
-}
-.watched {
-  position:absolute;
-  top:9px;
-  right:9px;
-  background:rgba(0,0,0,.75);
-  border-radius:50%;
-  width:26px;
-  height:26px;
-  display:grid;
-  place-items:center;
-  font-size:13px;
-}
-.source-tag {
-  position:absolute;
-  bottom:8px;
-  left:8px;
-  background:rgba(0,0,0,.75);
-  border-radius:5px;
-  padding:4px 7px;
-  font-size:10px;
-  color:#ddd;
-}
-.movie-title {
-  font-size:14px;
-  font-weight:650;
-  margin-top:10px;
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-}
-.movie-subtitle { color:var(--muted);font-size:12px;margin-top:4px }
-.empty {
-  padding:65px 15px;
-  text-align:center;
-  color:var(--muted);
-  border:1px dashed var(--border);
-  border-radius:14px;
-}
-.empty h3 { color:var(--text) }
-.modal {
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:50;
-  background:rgba(0,0,0,.78);
-  backdrop-filter:blur(12px);
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-}
-.modal.show { display:flex }
-.dialog {
-  width:min(760px,100%);
-  max-height:90vh;
-  overflow:auto;
-  background:#111319;
-  border:1px solid var(--border);
-  border-radius:17px;
-  padding:25px;
-}
-.dialog-header {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  margin-bottom:20px;
-}
-.dialog-header h2 { margin:0 }
-.detail-layout {
-  display:grid;
-  grid-template-columns:210px 1fr;
-  gap:25px;
-}
-.detail-poster {
-  width:100%;
-  aspect-ratio:2/3;
-  object-fit:cover;
-  border-radius:10px;
-  background:var(--panel2);
-}
-.detail-backdrop {
-  width:100%;
-  max-height:160px;
-  object-fit:cover;
-  border-radius:9px;
-  margin:15px 0;
-}
-.detail-info h2 { font-size:27px;margin:0 0 8px }
-.detail-info p { color:#b0b4bf;line-height:1.6 }
-.detail-actions { display:flex;gap:9px;flex-wrap:wrap;margin-top:18px }
-.field { margin:15px 0 }
-.field label {
-  display:block;
-  font-size:13px;
-  color:var(--muted);
-  margin-bottom:7px;
-}
-.field input { width:100% }
-.notice {
-  padding:12px 14px;
-  border-radius:9px;
-  background:#1b202a;
-  color:#bdc3d0;
-  font-size:13px;
-  line-height:1.5;
-}
-.storage-info { margin-top:22px;color:var(--muted);font-size:12px }
-#playerModal { background:#000;padding:0 }
-.player-shell {
-  width:100%;
-  height:100%;
-  display:flex;
-  flex-direction:column;
-}
-.player-top {
-  padding:15px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-#videoPlayer {
-  width:100%;
-  height:100%;
-  min-height:0;
-  background:#000;
-  object-fit:contain;
-}
-.player-bottom { padding:10px 20px;color:var(--muted);font-size:12px }
-.progress {
-  height:3px;
-  background:#30343d;
-  border-radius:5px;
-  overflow:hidden;
-  margin-top:7px;
-}
-.progress div { height:100%;background:white }
-footer {
-  border-top:1px solid var(--border);
-  color:#777e8c;
-  padding:25px 5%;
-  font-size:12px;
-  text-align:center;
-}
-@media(max-width:650px) {
-  header { padding:0 4% }
-  main { padding:0 4% 50px }
-  .hero { min-height:300px }
-  .hero-content { padding:23px }
-  .grid { grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 12px }
-  .detail-layout { grid-template-columns:115px 1fr;gap:15px }
-  .detail-info h2 { font-size:21px }
-  .header-actions button { padding:9px 10px;font-size:12px }
+:root{color-scheme:dark;--bg:#08090c;--panel:#111318;--panel2:#191c23;--text:#f5f5f7;--muted:#9297a3;--border:rgba(255,255,255,.09)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer;border:1px solid var(--border);border-radius:9px;padding:10px 15px;color:var(--text);background:var(--panel2);transition:.2s}
+button:hover{background:#292d36}
+button.primary{color:#090a0d;background:#f4f4f5;border-color:#f4f4f5;font-weight:700}
+button.primary:hover{background:#d6d6dc}
+button.danger{color:#ff7777}
+header{height:68px;padding:0 5%;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;background:rgba(8,9,12,.88);backdrop-filter:blur(22px);border-bottom:1px solid var(--border)}
+.brand{font-size:21px;font-weight:800;letter-spacing:-1px}
+.brand span{color:#a3a8b4}
+.header-actions{display:flex;gap:9px;flex-wrap:wrap}
+main{max-width:1600px;margin:auto;padding:0 5% 70px}
+.hero{min-height:390px;margin:28px 0 38px;border-radius:18px;overflow:hidden;position:relative;display:flex;align-items:end;background:linear-gradient(120deg,#171a22,#08090c 75%);border:1px solid var(--border)}
+.hero-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.48;mask-image:linear-gradient(to right,black,transparent 100%)}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#08090c 0%,transparent 80%)}
+.hero-content{z-index:1;padding:40px;max-width:650px}
+.eyebrow{color:#b3b7c1;font-size:11px;font-weight:800;letter-spacing:3px}
+.hero h1{font-size:clamp(35px,6vw,65px);letter-spacing:-3px;margin:12px 0}
+.hero p{color:#c2c5ce;line-height:1.6}
+.section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:28px 0 17px}
+.section-heading h2{font-size:21px;margin:0}
+.muted{color:var(--muted);font-size:13px}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:24px 0}
+.toolbar input,.toolbar select,.field input{color:var(--text);background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:11px 13px;outline:none}
+.toolbar input{flex:1;min-width:180px}
+.toolbar input:focus,.field input:focus{border-color:#777e8c}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:24px 16px}
+.movie-card{min-width:0;cursor:pointer}
+.poster{position:relative;aspect-ratio:2/3;overflow:hidden;border-radius:11px;background:linear-gradient(145deg,#20232b,#101116);border:1px solid var(--border)}
+.poster img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .35s,transform .35s}
+.poster img.loaded{opacity:1}
+.movie-card:hover .poster img{transform:scale(1.045)}
+.poster-placeholder{position:absolute;inset:0;display:grid;place-items:center;padding:15px;text-align:center;color:#777e8c;font-size:14px;font-weight:700}
+.watched{position:absolute;top:9px;right:9px;background:rgba(0,0,0,.75);border-radius:50%;width:26px;height:26px;display:grid;place-items:center;font-size:13px}
+.source-tag{position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.75);border-radius:5px;padding:4px 7px;font-size:10px;color:#ddd}
+.movie-title{font-size:14px;font-weight:650;margin-top:10px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.movie-subtitle{color:var(--muted);font-size:12px;margin-top:4px}
+.empty{padding:65px 15px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:14px}
+.empty h3{color:var(--text)}
+.modal{display:none;position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.78);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:20px}
+.modal.show{display:flex}
+.dialog{width:min(760px,100%);max-height:90vh;overflow:auto;background:#111319;border:1px solid var(--border);border-radius:17px;padding:25px}
+.dialog-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}
+.dialog-header h2{margin:0}
+.detail-layout{display:grid;grid-template-columns:210px 1fr;gap:25px}
+.detail-poster{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:10px;background:var(--panel2)}
+.detail-backdrop{width:100%;max-height:160px;object-fit:cover;border-radius:9px;margin:15px 0}
+.detail-info h2{font-size:27px;margin:0 0 8px}
+.detail-info p{color:#b0b4bf;line-height:1.6}
+.detail-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+.field{margin:15px 0}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:7px}
+.field input{width:100%}
+.notice{padding:12px 14px;border-radius:9px;background:#1b202a;color:#bdc3d0;font-size:13px;line-height:1.5}
+.storage-info{margin-top:22px;color:var(--muted);font-size:12px}
+#playerModal{background:#000;padding:0}
+.player-shell{width:100%;height:100%;display:flex;flex-direction:column}
+.player-top{padding:15px 20px;display:flex;justify-content:space-between;align-items:center}
+#videoPlayer{width:100%;height:100%;min-height:0;background:#000;object-fit:contain}
+.player-bottom{padding:10px 20px;color:var(--muted);font-size:12px}
+.progress{height:3px;background:#30343d;border-radius:5px;overflow:hidden;margin-top:7px}
+.progress div{height:100%;background:white}
+footer{border-top:1px solid var(--border);color:#777e8c;padding:25px 5%;font-size:12px;text-align:center}
+@media(max-width:650px){
+header{padding:0 4%}
+main{padding:0 4% 50px}
+.hero{min-height:300px}
+.hero-content{padding:23px}
+.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 12px}
+.detail-layout{grid-template-columns:115px 1fr;gap:15px}
+.detail-info h2{font-size:21px}
+.header-actions button{padding:9px 10px;font-size:12px}
 }
 </style>
 </head>
 <body>
-
 <header>
   <div class="brand">ST4R <span>CINEMA</span></div>
   <div class="header-actions">
@@ -326,7 +99,7 @@ footer {
     <div class="hero-content">
       <div class="eyebrow">YOUR PERSONAL LIBRARY</div>
       <h1 id="heroTitle">Your cinema.</h1>
-      <p id="heroDescription">Your movies, your collection, your rules. A personal movie library hosted on your own website.</p>
+      <p id="heroDescription">Your movies, your collection, your rules.</p>
       <button class="primary" onclick="document.getElementById('fileInput').click()">＋ Add movies</button>
     </div>
   </section>
@@ -355,23 +128,17 @@ footer {
   <div id="library" class="grid"></div>
   <div id="emptyState" class="empty">
     <h3>Your library is waiting.</h3>
-    <p>Import movie files or add a streaming URL to get started.</p>
+    <p>Import local movies or add a streaming URL.</p>
     <button class="primary" onclick="document.getElementById('fileInput').click()">Import movies</button>
     <button onclick="openURLImport()">Import from URL</button>
   </div>
-
   <div class="storage-info" id="storageInfo">Checking browser storage...</div>
 </main>
 
 <footer>ST4R CINEMA · PERSONAL MEDIA LIBRARY · NO ADS · NO SUBSCRIPTIONS</footer>
 
-<input id="fileInput" type="file" multiple
-  accept="video/*,image/*,.mp4,.m4v,.mov,.webm,.mkv,.avi,.wmv,.mpeg,.mpg,.ts,.m2ts,.jpg,.jpeg,.png,.webp"
-  hidden onchange="handleImport(this.files);this.value=''">
-
-<input id="folderInput" type="file" multiple webkitdirectory
-  accept="video/*,image/*"
-  hidden onchange="handleImport(this.files);this.value=''">
+<input id="fileInput" type="file" multiple accept="video/*,image/*,.mp4,.m4v,.mov,.webm,.mkv,.avi,.wmv,.mpeg,.mpg,.ts,.m2ts,.jpg,.jpeg,.png,.webp" hidden onchange="handleImport(this.files);this.value=''">
+<input id="folderInput" type="file" multiple webkitdirectory accept="video/*,image/*" hidden onchange="handleImport(this.files);this.value=''">
 
 <div class="modal" id="detailModal" onclick="if(event.target===this)closeModal('detailModal')">
   <div class="dialog">
@@ -389,36 +156,30 @@ footer {
       <h2 id="urlDialogTitle">Import movie from URL</h2>
       <button onclick="closeModal('urlModal')">✕</button>
     </div>
-
     <div class="notice">
-      Enter a direct video file or supported streaming URL. A normal webpage link to a movie is not necessarily a playable video stream.
+      ST4R Cinema will try to identify the movie from its URL filename and look it up on TMDB. If it cannot identify the movie, it will use your entered title.
     </div>
-
     <div class="field">
-      <label>Movie title</label>
-      <input id="urlTitle" placeholder="Example: Interstellar">
+      <label>Movie title (used if the URL has no recognizable title)</label>
+      <input id="urlTitle" placeholder="Example: The Odyssey">
     </div>
-
     <div class="field">
       <label>Video URL</label>
       <input id="urlVideo" type="url" placeholder="https://example.com/movie.mp4">
     </div>
-
     <div class="field">
-      <label>Thumbnail URL (optional)</label>
-      <input id="urlPoster" type="url" placeholder="https://example.com/movie-poster.jpg">
+      <label>Thumbnail URL (optional, overrides TMDB)</label>
+      <input id="urlPoster" type="url" placeholder="https://example.com/poster.jpg">
     </div>
-
     <div class="field">
-      <label>Cover / backdrop URL (optional)</label>
-      <input id="urlBackdrop" type="url" placeholder="https://example.com/movie-cover.jpg">
+      <label>Cover / backdrop URL (optional, overrides TMDB)</label>
+      <input id="urlBackdrop" type="url" placeholder="https://example.com/cover.jpg">
     </div>
-
     <div class="detail-actions">
       <button class="primary" id="saveURLButton" onclick="saveURLMovie()">Add to library</button>
       <button onclick="closeModal('urlModal')">Cancel</button>
     </div>
-    <div class="storage-info">URL movies store their title and links in your browser. The video itself streams from its original host.</div>
+    <div id="importStatus" class="storage-info"></div>
   </div>
 </div>
 
@@ -429,11 +190,11 @@ footer {
       <button onclick="closeModal('settingsModal')">✕</button>
     </div>
     <div class="field">
-      <label>TMDB API key (optional, for movie information only)</label>
+      <label>TMDB API key</label>
       <input class="settings-input" id="tmdbKey" type="password" placeholder="Enter your TMDB API key">
     </div>
     <div class="notice">
-      TMDB will not supply posters or covers. Your local matching images and manually supplied image URLs are the only artwork used.
+      TMDB provides movie identification, titles, release dates, posters, and backdrops. Your API key is stored in this browser.
     </div>
     <div class="detail-actions">
       <button class="primary" onclick="saveSettings()">Save settings</button>
@@ -459,632 +220,631 @@ footer {
 </div>
 
 <script>
-const DB_NAME = "st4r-cinema";
-const DB_VERSION = 1;
-const STORE = "movies";
+const DB_NAME="st4r-cinema";
+const DB_VERSION=1;
+const STORE="movies";
+const TMDB_IMAGE="https://image.tmdb.org/t/p/";
+let db,movies=[],activeMovie=null,editingURLId=null,heroObjectURL=null;
+let posterURLs=new Map(),backdropURLs=new Map(),lazyObserver=null;
 
-let db;
-let movies = [];
-let activeMovie = null;
-let editingURLId = null;
-let heroObjectURL = null;
-let posterURLs = new Map();
-let backdropURLs = new Map();
-let lazyObserver = null;
+const VIDEO_EXTENSIONS=/\.(mp4|m4v|mov|webm|mkv|avi|wmv|mpeg|mpg|ts|m2ts|ogv)$/i;
+const IMAGE_EXTENSIONS=/\.(jpg|jpeg|png|webp|avif|gif)$/i;
 
-const VIDEO_EXTENSIONS = /\.(mp4|m4v|mov|webm|mkv|avi|wmv|mpeg|mpg|ts|m2ts|ogv)$/i;
-const IMAGE_EXTENSIONS = /\.(jpg|jpeg|png|webp|avif|gif)$/i;
-
-function openDB() {
-  return new Promise((resolve,reject) => {
-    const request = indexedDB.open(DB_NAME,DB_VERSION);
-    request.onupgradeneeded = () => {
-      const database = request.result;
-      if (!database.objectStoreNames.contains(STORE)) {
-        database.createObjectStore(STORE,{keyPath:"id"});
-      }
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    const request=indexedDB.open(DB_NAME,DB_VERSION);
+    request.onupgradeneeded=()=>{
+      if(!request.result.objectStoreNames.contains(STORE))
+        request.result.createObjectStore(STORE,{keyPath:"id"});
     };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+    request.onsuccess=()=>resolve(request.result);
+    request.onerror=()=>reject(request.error);
   });
 }
 
-function getAllMovies() {
-  return new Promise((resolve,reject) => {
-    const tx = db.transaction(STORE,"readonly");
-    const request = tx.objectStore(STORE).getAll();
-    request.onsuccess = () => resolve(request.result || []);
-    request.onerror = () => reject(request.error);
+function getAllMovies(){
+  return new Promise((resolve,reject)=>{
+    const request=db.transaction(STORE,"readonly").objectStore(STORE).getAll();
+    request.onsuccess=()=>resolve(request.result||[]);
+    request.onerror=()=>reject(request.error);
   });
 }
 
-function saveMovie(movie) {
-  return new Promise((resolve,reject) => {
-    const tx = db.transaction(STORE,"readwrite");
+function saveMovie(movie){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,"readwrite");
     tx.objectStore(STORE).put(movie);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-    tx.onabort = () => reject(tx.error);
+    tx.oncomplete=resolve;
+    tx.onerror=()=>reject(tx.error);
   });
 }
 
-function deleteMovieRecord(id) {
-  return new Promise((resolve,reject) => {
-    const tx = db.transaction(STORE,"readwrite");
+function deleteMovieRecord(id){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,"readwrite");
     tx.objectStore(STORE).delete(id);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
+    tx.oncomplete=resolve;
+    tx.onerror=()=>reject(tx.error);
   });
 }
 
-function makeId() {
-  return crypto.randomUUID ? crypto.randomUUID() : Date.now()+"-"+Math.random();
+function makeId(){
+  return crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random();
 }
 
-function escapeHTML(value="") {
-  return String(value).replace(/[&<>"']/g,char => ({
+function escapeHTML(value=""){
+  return String(value).replace(/[&<>"']/g,char=>({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   })[char]);
 }
 
-function normalizeFilename(name) {
+function normalizeFilename(name){
   return name.normalize("NFKC").trim().toLowerCase();
 }
 
-function filenameBase(name) {
+function filenameBase(name){
   return name.replace(/\.[^.]+$/,"");
 }
 
-function parentPath(file) {
-  const path = file.webkitRelativePath || "";
-  return path.includes("/") ? path.substring(0,path.lastIndexOf("/")) : "";
+function parentPath(file){
+  const path=file.webkitRelativePath||"";
+  return path.includes("/")?path.substring(0,path.lastIndexOf("/")):"";
 }
 
-function imageMatches(video,image) {
-  if (parentPath(video) !== parentPath(image)) return false;
-
-  const videoBase = normalizeFilename(filenameBase(video.name));
-  const imageBase = normalizeFilename(filenameBase(image.name));
-
-  if (imageBase === videoBase) return "poster";
-
-  const posterSuffixes = ["-thumbnail","_thumbnail","-thumb","_thumb","-poster","_poster"];
-  const coverSuffixes = ["-cover","_cover","-backdrop","_backdrop"];
-
-  for (const suffix of posterSuffixes) {
-    if (imageBase === videoBase + suffix) return "poster";
-  }
-
-  for (const suffix of coverSuffixes) {
-    if (imageBase === videoBase + suffix) return "backdrop";
-  }
-
+function imageMatches(video,image){
+  if(parentPath(video)!==parentPath(image))return null;
+  const base=normalizeFilename(filenameBase(video.name));
+  const imageBase=normalizeFilename(filenameBase(image.name));
+  if(imageBase===base)return "poster";
+  for(const suffix of ["-thumbnail","_thumbnail","-thumb","_thumb","-poster","_poster"])
+    if(imageBase===base+suffix)return "poster";
+  for(const suffix of ["-cover","_cover","-backdrop","_backdrop"])
+    if(imageBase===base+suffix)return "backdrop";
   return null;
 }
 
-function imagePriority(file) {
-  const ext = (file.name.match(/\.[^.]+$/) || [""])[0].toLowerCase();
-  return ({".jpg":1,".jpeg":2,".webp":3,".png":4,".avif":5,".gif":6})[ext] || 10;
+function imagePriority(file){
+  const ext=(file.name.match(/\.[^.]+$/)||[""])[0].toLowerCase();
+  return ({".jpg":1,".jpeg":2,".webp":3,".png":4,".avif":5,".gif":6})[ext]||10;
 }
 
-function chooseArtwork(video,images,type) {
-  const matches = images.filter(image => imageMatches(video,image) === type);
-  matches.sort((a,b) => {
-    const aExact = normalizeFilename(filenameBase(a.name)) === normalizeFilename(filenameBase(video.name));
-    const bExact = normalizeFilename(filenameBase(b.name)) === normalizeFilename(filenameBase(video.name));
-    if (aExact !== bExact) return aExact ? -1 : 1;
-    return imagePriority(a)-imagePriority(b);
+function chooseArtwork(video,images,type){
+  const matches=images.filter(image=>imageMatches(video,image)===type);
+  matches.sort((a,b)=>{
+    const ae=normalizeFilename(filenameBase(a.name))===normalizeFilename(filenameBase(video.name));
+    const be=normalizeFilename(filenameBase(b.name))===normalizeFilename(filenameBase(video.name));
+    return ae!==be?(ae?-1:1):imagePriority(a)-imagePriority(b);
   });
-  return matches[0] || null;
+  return matches[0]||null;
 }
 
-async function handleImport(fileList) {
-  const files = Array.from(fileList || []);
-  const videos = files.filter(file => VIDEO_EXTENSIONS.test(file.name));
-  const images = files.filter(file => IMAGE_EXTENSIONS.test(file.name));
+async function handleImport(fileList){
+  const files=Array.from(fileList||[]);
+  const videos=files.filter(file=>VIDEO_EXTENSIONS.test(file.name));
+  const images=files.filter(file=>IMAGE_EXTENSIONS.test(file.name));
+  if(!videos.length){alert("No supported video files found.");return;}
+  let imported=0;
 
-  if (!videos.length) {
-    alert("No supported video files were found in your selection.");
-    return;
-  }
-
-  let imported = 0;
-
-  for (const file of videos) {
-    const duplicate = movies.find(movie =>
-      movie.source === "file" &&
-      movie.fileName === file.name &&
-      movie.fileSize === file.size &&
-      movie.filePath === (file.webkitRelativePath || file.name)
-    );
-
-    if (duplicate) continue;
-
-    const poster = chooseArtwork(file,images,"poster");
-    const backdrop = chooseArtwork(file,images,"backdrop");
-
-    const movie = {
-      id:makeId(),
-      source:"file",
-      title:filenameBase(file.name),
-      file,
-      fileName:file.name,
-      filePath:file.webkitRelativePath || file.name,
+  for(const file of videos){
+    const duplicate=movies.find(movie=>movie.source==="file"&&movie.fileName===file.name&&movie.fileSize===file.size&&movie.filePath===(file.webkitRelativePath||file.name));
+    if(duplicate)continue;
+    const movie={
+      id:makeId(),source:"file",title:filenameBase(file.name),file,
+      fileName:file.name,filePath:file.webkitRelativePath||file.name,
       fileSize:file.size,
-      customPoster:poster || null,
-      customBackdrop:backdrop || null,
-      added:Date.now(),
-      watched:false,
-      position:0,
-      duration:0,
-      year:"",
-      overview:""
+      customPoster:chooseArtwork(file,images,"poster"),
+      customBackdrop:chooseArtwork(file,images,"backdrop"),
+      added:Date.now(),watched:false,position:0,duration:0,year:"",overview:""
     };
-
-    try {
-      await saveMovie(movie);
-      imported++;
-    } catch(error) {
-      console.error(error);
-      alert("Could not save "+file.name+". Your browser may be running out of storage.");
-    }
+    try{await saveMovie(movie);imported++;}
+    catch(error){console.error(error);alert("Could not save "+file.name+". Browser storage may be full.");}
   }
 
   await refreshLibrary();
-  alert(imported ? imported+" movie(s) imported." : "No new movies were imported. They may already be in your library.");
+  alert(imported?imported+" movie(s) imported.":"No new movies were imported.");
 }
 
-function cachedBlobURL(map,key,blob) {
-  if (!blob) return "";
-  if (map.has(key)) return map.get(key);
-  const url = URL.createObjectURL(blob);
+function cachedBlobURL(map,key,blob){
+  if(!blob)return "";
+  if(map.has(key))return map.get(key);
+  const url=URL.createObjectURL(blob);
   map.set(key,url);
   return url;
 }
 
-function posterURL(movie) {
-  if (movie.source === "url") return movie.posterURL || "";
+function posterURL(movie){
+  if(movie.source==="url")return movie.posterURL||"";
   return cachedBlobURL(posterURLs,movie.id,movie.customPoster);
 }
 
-function backdropURL(movie) {
-  if (movie.source === "url") return movie.backdropURL || "";
+function backdropURL(movie){
+  if(movie.source==="url")return movie.backdropURL||"";
   return cachedBlobURL(backdropURLs,movie.id,movie.customBackdrop);
 }
 
-function revokeArtwork() {
-  for (const url of posterURLs.values()) URL.revokeObjectURL(url);
-  for (const url of backdropURLs.values()) URL.revokeObjectURL(url);
+function revokeArtwork(){
+  for(const url of posterURLs.values())URL.revokeObjectURL(url);
+  for(const url of backdropURLs.values())URL.revokeObjectURL(url);
   posterURLs.clear();
   backdropURLs.clear();
-  if (heroObjectURL) {
-    URL.revokeObjectURL(heroObjectURL);
-    heroObjectURL = null;
-  }
+  if(heroObjectURL){URL.revokeObjectURL(heroObjectURL);heroObjectURL=null;}
 }
 
-function setHero(movie) {
-  const hero = document.getElementById("heroImage");
-  if (heroObjectURL) {
-    URL.revokeObjectURL(heroObjectURL);
-    heroObjectURL = null;
-  }
-
+function setHero(movie){
+  const hero=document.getElementById("heroImage");
+  if(heroObjectURL){URL.revokeObjectURL(heroObjectURL);heroObjectURL=null;}
   hero.removeAttribute("src");
-  if (!movie) {
-    document.getElementById("heroTitle").textContent = "Your cinema.";
-    document.getElementById("heroDescription").textContent =
-      "Your movies, your collection, your rules.";
+  if(!movie){
+    document.getElementById("heroTitle").textContent="Your cinema.";
+    document.getElementById("heroDescription").textContent="Your movies, your collection, your rules.";
     return;
   }
-
-  document.getElementById("heroTitle").textContent = movie.title;
-  document.getElementById("heroDescription").textContent =
-    movie.overview || "Now featuring in your personal movie library.";
-
-  let source = backdropURL(movie) || posterURL(movie);
-
-  if (source) {
-    if (movie.source === "file" && movie.customBackdrop) {
-      heroObjectURL = URL.createObjectURL(movie.customBackdrop);
-      source = heroObjectURL;
-    } else if (movie.source === "file" && !movie.customBackdrop && movie.customPoster) {
-      heroObjectURL = URL.createObjectURL(movie.customPoster);
-      source = heroObjectURL;
-    }
-    hero.src = source;
+  document.getElementById("heroTitle").textContent=movie.title;
+  document.getElementById("heroDescription").textContent=movie.overview||"Now featuring in your personal movie library.";
+  let source=backdropURL(movie)||posterURL(movie);
+  if(movie.source==="file"){
+    const blob=movie.customBackdrop||movie.customPoster;
+    if(blob){heroObjectURL=URL.createObjectURL(blob);source=heroObjectURL;}
   }
+  if(source)hero.src=source;
 }
 
-function observeArtwork() {
-  if (lazyObserver) lazyObserver.disconnect();
-
-  lazyObserver = new IntersectionObserver(entries => {
-    for (const entry of entries) {
-      if (!entry.isIntersecting) continue;
-      const img = entry.target;
-      img.src = img.dataset.src;
-      img.onload = () => img.classList.add("loaded");
-      img.onerror = () => img.removeAttribute("src");
+function observeArtwork(){
+  if(lazyObserver)lazyObserver.disconnect();
+  lazyObserver=new IntersectionObserver(entries=>{
+    for(const entry of entries){
+      if(!entry.isIntersecting)continue;
+      const img=entry.target;
+      img.src=img.dataset.src;
+      img.onload=()=>img.classList.add("loaded");
+      img.onerror=()=>img.removeAttribute("src");
       lazyObserver.unobserve(img);
     }
   },{rootMargin:"400px"});
-
-  document.querySelectorAll("img[data-src]").forEach(img => lazyObserver.observe(img));
+  document.querySelectorAll("img[data-src]").forEach(img=>lazyObserver.observe(img));
 }
 
-function renderLibrary() {
-  const container = document.getElementById("library");
-  const empty = document.getElementById("emptyState");
-  const query = document.getElementById("searchInput").value.toLowerCase();
-  const filter = document.getElementById("filterSelect").value;
-  const sort = document.getElementById("sortSelect").value;
-
-  let list = movies.filter(movie => {
-    const matches = movie.title.toLowerCase().includes(query);
-    const watched = filter === "all" ||
-      (filter === "watched" && movie.watched) ||
-      (filter === "unwatched" && !movie.watched);
-    return matches && watched;
+function renderLibrary(){
+  const container=document.getElementById("library");
+  const empty=document.getElementById("emptyState");
+  const query=document.getElementById("searchInput").value.toLowerCase();
+  const filter=document.getElementById("filterSelect").value;
+  const sort=document.getElementById("sortSelect").value;
+  let list=movies.filter(movie=>{
+    const matches=movie.title.toLowerCase().includes(query);
+    const watched=filter==="all"||(filter==="watched"&&movie.watched)||(filter==="unwatched"&&!movie.watched);
+    return matches&&watched;
   });
+  if(sort==="title")list.sort((a,b)=>a.title.localeCompare(b.title));
+  if(sort==="added")list.sort((a,b)=>b.added-a.added);
+  if(sort==="year")list.sort((a,b)=>String(b.year).localeCompare(String(a.year)));
+  if(sort==="watched")list.sort((a,b)=>Number(b.watched)-Number(a.watched));
 
-  if (sort === "title") list.sort((a,b) => a.title.localeCompare(b.title));
-  if (sort === "added") list.sort((a,b) => b.added-a.added);
-  if (sort === "year") list.sort((a,b) => String(b.year).localeCompare(String(a.year)));
-  if (sort === "watched") list.sort((a,b) => Number(b.watched)-Number(a.watched));
+  document.getElementById("movieCount").textContent=movies.length+" movies";
+  empty.style.display=list.length?"none":"block";
+  container.innerHTML="";
 
-  document.getElementById("movieCount").textContent =
-    movies.length+" movie"+(movies.length===1?"":"s");
-
-  empty.style.display = list.length ? "none" : "block";
-  container.innerHTML = "";
-
-  for (const movie of list) {
-    const poster = posterURL(movie);
-    const card = document.createElement("div");
-    card.className = "movie-card";
-    card.innerHTML = `
+  for(const movie of list){
+    const poster=posterURL(movie);
+    const card=document.createElement("div");
+    card.className="movie-card";
+    card.innerHTML=`
       <div class="poster">
         <div class="poster-placeholder">${escapeHTML(movie.title)}</div>
-        ${poster ? `<img data-src="${escapeHTML(poster)}" alt="${escapeHTML(movie.title)}">` : ""}
-        ${movie.watched ? '<div class="watched">✓</div>' : ""}
-        ${movie.source === "url" ? '<div class="source-tag">STREAM</div>' : ""}
+        ${poster?`<img data-src="${escapeHTML(poster)}" alt="${escapeHTML(movie.title)}">`:""}
+        ${movie.watched?'<div class="watched">✓</div>':""}
+        ${movie.source==="url"?'<div class="source-tag">STREAM</div>':""}
       </div>
       <div class="movie-title">${escapeHTML(movie.title)}</div>
-      <div class="movie-subtitle">${escapeHTML(movie.year || (movie.source === "url" ? "Streaming" : "Local file"))}</div>
-    `;
-    card.onclick = () => openDetails(movie.id);
+      <div class="movie-subtitle">${escapeHTML(movie.year|| (movie.source==="url"?"Streaming":"Local file"))}</div>`;
+    card.onclick=()=>openDetails(movie.id);
     container.appendChild(card);
   }
-
   observeArtwork();
 }
 
-async function refreshLibrary() {
-  movies = await getAllMovies();
-  movies.sort((a,b) => b.added-a.added);
+async function refreshLibrary(){
+  movies=await getAllMovies();
+  movies.sort((a,b)=>b.added-a.added);
   renderLibrary();
   updateStorageInfo();
-  if (!activeMovie) {
-    const featured = movies.find(movie => movie.backdropURL || movie.customBackdrop || movie.posterURL || movie.customPoster);
-    setHero(featured || movies[0] || null);
+  if(!activeMovie){
+    const featured=movies.find(movie=>movie.backdropURL||movie.customBackdrop||movie.posterURL||movie.customPoster);
+    setHero(featured||movies[0]||null);
   }
 }
 
-function openDetails(id) {
-  const movie = movies.find(item => item.id === id);
-  if (!movie) return;
-
-  const poster = posterURL(movie);
-  const backdrop = backdropURL(movie);
-
-  document.getElementById("detailContent").innerHTML = `
+function openDetails(id){
+  const movie=movies.find(item=>item.id===id);
+  if(!movie)return;
+  const poster=posterURL(movie);
+  const backdrop=backdropURL(movie);
+  document.getElementById("detailContent").innerHTML=`
     <div class="detail-layout">
       <img class="detail-poster" src="${escapeHTML(poster)}" alt="">
       <div class="detail-info">
         <h2>${escapeHTML(movie.title)}</h2>
-        <div class="muted">${escapeHTML(movie.year || "")} ${movie.watched ? " · Watched" : ""}</div>
-        <p>${escapeHTML(movie.overview || "No description added.")}</p>
-        <div class="muted">${movie.source === "url" ? "Streaming from URL" : "Imported video file"}</div>
+        <div class="muted">${escapeHTML(movie.year||"")}${movie.watched?" · Watched":""}</div>
+        <p>${escapeHTML(movie.overview||"No description available.")}</p>
+        <div class="muted">${movie.source==="url"?"Streaming from URL":"Imported video file"}</div>
         <div class="detail-actions">
           <button class="primary" onclick="playMovie('${movie.id}')">▶ Play</button>
-          <button onclick="toggleWatched('${movie.id}')">${movie.watched ? "Mark unwatched" : "Mark watched"}</button>
-          ${movie.source === "url" ? `<button onclick="editURLMovie('${movie.id}')">Edit URL</button>` : ""}
+          <button onclick="toggleWatched('${movie.id}')">${movie.watched?"Mark unwatched":"Mark watched"}</button>
+          ${movie.source==="url"?`<button onclick="editURLMovie('${movie.id}')">Edit URL</button>`:""}
           <button class="danger" onclick="removeMovie('${movie.id}')">Delete</button>
         </div>
       </div>
     </div>
-    ${backdrop ? `<img class="detail-backdrop" src="${escapeHTML(backdrop)}" alt="">` : ""}
+    ${backdrop?`<img class="detail-backdrop" src="${escapeHTML(backdrop)}" alt="">`:""}
   `;
-
   document.getElementById("detailModal").classList.add("show");
 }
 
-function closeModal(id) {
-  document.getElementById(id).classList.remove("show");
-}
+function closeModal(id){document.getElementById(id).classList.remove("show");}
 
-async function toggleWatched(id) {
-  const movie = movies.find(item => item.id === id);
-  if (!movie) return;
-  movie.watched = !movie.watched;
-  if (movie.watched) movie.position = 0;
+async function toggleWatched(id){
+  const movie=movies.find(item=>item.id===id);
+  if(!movie)return;
+  movie.watched=!movie.watched;
+  if(movie.watched)movie.position=0;
   await saveMovie(movie);
   await refreshLibrary();
   openDetails(id);
 }
 
-async function removeMovie(id) {
-  if (!confirm("Delete this movie from your library?")) return;
-  const movie = movies.find(item => item.id === id);
-  if (movie?.source === "file") {
-    const poster = posterURLs.get(id);
-    const backdrop = backdropURLs.get(id);
-    if (poster) URL.revokeObjectURL(poster);
-    if (backdrop) URL.revokeObjectURL(backdrop);
-    posterURLs.delete(id);
-    backdropURLs.delete(id);
-  }
+async function removeMovie(id){
+  if(!confirm("Delete this movie from your library?"))return;
+  const poster=posterURLs.get(id),backdrop=backdropURLs.get(id);
+  if(poster)URL.revokeObjectURL(poster);
+  if(backdrop)URL.revokeObjectURL(backdrop);
+  posterURLs.delete(id);
+  backdropURLs.delete(id);
   await deleteMovieRecord(id);
   closeModal("detailModal");
   await refreshLibrary();
 }
 
-function openURLImport() {
-  editingURLId = null;
-  document.getElementById("urlDialogTitle").textContent = "Import movie from URL";
-  document.getElementById("saveURLButton").textContent = "Add to library";
-  document.getElementById("urlTitle").value = "";
-  document.getElementById("urlVideo").value = "";
-  document.getElementById("urlPoster").value = "";
-  document.getElementById("urlBackdrop").value = "";
+function openURLImport(){
+  editingURLId=null;
+  document.getElementById("urlDialogTitle").textContent="Import movie from URL";
+  document.getElementById("saveURLButton").textContent="Add to library";
+  document.getElementById("urlTitle").value="";
+  document.getElementById("urlVideo").value="";
+  document.getElementById("urlPoster").value="";
+  document.getElementById("urlBackdrop").value="";
+  document.getElementById("importStatus").textContent="";
   document.getElementById("urlModal").classList.add("show");
 }
 
-function editURLMovie(id) {
-  const movie = movies.find(item => item.id === id);
-  if (!movie || movie.source !== "url") return;
-
+function editURLMovie(id){
+  const movie=movies.find(item=>item.id===id);
+  if(!movie||movie.source!=="url")return;
   closeModal("detailModal");
-  editingURLId = id;
-
-  document.getElementById("urlDialogTitle").textContent = "Edit streaming movie";
-  document.getElementById("saveURLButton").textContent = "Save changes";
-  document.getElementById("urlTitle").value = movie.title || "";
-  document.getElementById("urlVideo").value = movie.videoURL || "";
-  document.getElementById("urlPoster").value = movie.posterURL || "";
-  document.getElementById("urlBackdrop").value = movie.backdropURL || "";
+  editingURLId=id;
+  document.getElementById("urlDialogTitle").textContent="Edit streaming movie";
+  document.getElementById("saveURLButton").textContent="Save changes";
+  document.getElementById("urlTitle").value=movie.manualTitle||movie.title||"";
+  document.getElementById("urlVideo").value=movie.videoURL||"";
+  document.getElementById("urlPoster").value=movie.manualPosterURL||"";
+  document.getElementById("urlBackdrop").value=movie.manualBackdropURL||"";
+  document.getElementById("importStatus").textContent="";
   document.getElementById("urlModal").classList.add("show");
 }
 
-function validWebURL(value) {
-  try {
-    const url = new URL(value);
-    return url.protocol === "https:" || url.protocol === "http:";
-  } catch {
-    return false;
-  }
+function validWebURL(value){
+  try{
+    const url=new URL(value);
+    return url.protocol==="https:"||url.protocol==="http:";
+  }catch{return false;}
 }
 
-async function saveURLMovie() {
-  const title = document.getElementById("urlTitle").value.trim();
-  const videoURL = document.getElementById("urlVideo").value.trim();
-  const posterURLValue = document.getElementById("urlPoster").value.trim();
-  const backdropURLValue = document.getElementById("urlBackdrop").value.trim();
+function decodeSafe(value){
+  try{return decodeURIComponent(value);}catch{return value;}
+}
 
-  if (!title) {
-    alert("Please enter a movie title.");
-    return;
-  }
-  if (!validWebURL(videoURL)) {
-    alert("Please enter a valid HTTP or HTTPS video URL.");
-    return;
-  }
-  if (posterURLValue && !validWebURL(posterURLValue)) {
-    alert("The thumbnail URL must be a valid HTTP or HTTPS URL.");
-    return;
-  }
-  if (backdropURLValue && !validWebURL(backdropURLValue)) {
-    alert("The cover URL must be a valid HTTP or HTTPS URL.");
-    return;
-  }
+function getFilenameFromURL(rawURL){
+  let parsed;
+  try{parsed=new URL(rawURL);}catch{return "";}
+  let filename="";
 
-  let movie;
+  const disposition=parsed.searchParams.get("response-content-disposition")||
+    parsed.searchParams.get("content-disposition")||"";
 
-  if (editingURLId) {
-    movie = movies.find(item => item.id === editingURLId);
-    if (!movie) return;
-  } else {
-    movie = {
-      id:makeId(),
-      source:"url",
-      added:Date.now(),
-      watched:false,
-      position:0,
-      duration:0,
-      year:"",
-      overview:""
-    };
+  const extended=disposition.match(/filename\*\s*=\s*(?:UTF-8'')?([^;]+)/i);
+  const standard=disposition.match(/filename\s*=\s*(?:"([^"]+)"|'([^']+)'|([^;]+))/i);
+
+  if(extended)filename=decodeSafe(extended[1].trim().replace(/^["']|["']$/g,""));
+  else if(standard)filename=(standard[1]||standard[2]||standard[3]||"").trim();
+
+  if(!filename){
+    const path=parsed.pathname.split("/").filter(Boolean).pop()||"";
+    filename=decodeSafe(path);
   }
 
-  movie.source = "url";
-  movie.title = title;
-  movie.videoURL = videoURL;
-  movie.posterURL = posterURLValue;
-  movie.backdropURL = backdropURLValue;
+  return filename;
+}
 
-  try {
+function cleanMovieFilename(filename){
+  if(!filename)return null;
+  let name=filenameBase(filename).replace(/\+/g," ");
+  name=decodeSafe(name);
+  name=name.replace(/[._]+/g," ").replace(/\s+/g," ").trim();
+
+  const yearMatch=name.match(/\b(19\d{2}|20\d{2})\b/);
+  const year=yearMatch?yearMatch[1]:"";
+
+  if(year){
+    name=name.substring(0,yearMatch.index).trim();
+  }else{
+    const technical=/\b(2160p|1080p|720p|480p|4k|8k|10bit|8bit|bluray|blu ray|brrip|bdrip|webrip|web dl|webdl|hdtv|hdr|hdr10|dv|x264|x265|h264|h265|hevc|av1|aac|dts|ac3|eac3|flac|proper|repack|remux|yify|yts|psa|rarbg|extended|unrated|directors cut)\b/i;
+    const match=name.match(technical);
+    if(match)name=name.substring(0,match.index).trim();
+  }
+
+  name=name.replace(/[\s-]+$/,"").trim();
+
+  if(!name||/^(download|video|movie|file|stream|unknown)$/i.test(name))return null;
+
+  return {title:name,year};
+}
+
+function extractMovieIdentity(rawURL,fallbackTitle){
+  const filename=getFilenameFromURL(rawURL);
+  const extracted=cleanMovieFilename(filename);
+  if(extracted)return {...extracted,fromURL:true,filename};
+  return {title:fallbackTitle.trim(),year:"",fromURL:false,filename};
+}
+
+async function tmdbSearch(title,year){
+  const key=localStorage.getItem("st4r_tmdb_key");
+  if(!key)throw new Error("Add your TMDB API key in Settings to enable automatic movie identification.");
+
+  const params=new URLSearchParams({api_key:key,query:title,include_adult:"false"});
+  if(year)params.set("year",year);
+
+  const response=await fetch("https://api.themoviedb.org/3/search/movie?"+params);
+  if(!response.ok)throw new Error("TMDB search failed ("+response.status+").");
+  const data=await response.json();
+
+  if(!data.results||!data.results.length)throw new Error("TMDB could not find a movie matching \""+title+"\".");
+
+  let results=data.results;
+  if(year){
+    const exactYear=results.filter(item=>(item.release_date||"").startsWith(year));
+    if(exactYear.length)results=exactYear;
+  }
+
+  const best=results[0];
+  const detailsResponse=await fetch(
+    "https://api.themoviedb.org/3/movie/"+best.id+"?api_key="+encodeURIComponent(key)
+  );
+  if(!detailsResponse.ok)throw new Error("TMDB found the movie but could not load its details.");
+
+  const details=await detailsResponse.json();
+
+  return {
+    tmdbId:details.id,
+    title:details.title||best.title,
+    year:(details.release_date||best.release_date||"").slice(0,4),
+    overview:details.overview||"",
+    posterURL:details.poster_path?TMDB_IMAGE+"w500"+details.poster_path:"",
+    backdropURL:details.backdrop_path?TMDB_IMAGE+"w1280"+details.backdrop_path:"",
+    rating:details.vote_average||0,
+    genres:(details.genres||[]).map(item=>item.name)
+  };
+}
+
+async function saveURLMovie(){
+  const manualTitle=document.getElementById("urlTitle").value.trim();
+  const videoURL=document.getElementById("urlVideo").value.trim();
+  const manualPosterURL=document.getElementById("urlPoster").value.trim();
+  const manualBackdropURL=document.getElementById("urlBackdrop").value.trim();
+  const status=document.getElementById("importStatus");
+  const button=document.getElementById("saveURLButton");
+
+  if(!validWebURL(videoURL)){alert("Enter a valid HTTP or HTTPS video URL.");return;}
+  if(manualPosterURL&&!validWebURL(manualPosterURL)){alert("Enter a valid thumbnail URL.");return;}
+  if(manualBackdropURL&&!validWebURL(manualBackdropURL)){alert("Enter a valid cover URL.");return;}
+
+  button.disabled=true;
+  status.textContent="Reading movie filename...";
+
+  try{
+    const identity=extractMovieIdentity(videoURL,manualTitle);
+
+    if(!identity.title){
+      throw new Error("Could not identify a movie from this URL. Please enter a movie title.");
+    }
+
+    status.textContent="Searching TMDB for "+identity.title+"...";
+
+    let metadata={};
+    try{
+      metadata=await tmdbSearch(identity.title,identity.year);
+    }catch(error){
+      if(localStorage.getItem("st4r_tmdb_key")){
+        console.warn("TMDB lookup:",error);
+      }
+      status.textContent=error.message+" Saving with the extracted or entered title instead.";
+    }
+
+    let movie=editingURLId?movies.find(item=>item.id===editingURLId):null;
+
+    if(!movie){
+      movie={
+        id:makeId(),
+        source:"url",
+        added:Date.now(),
+        watched:false,
+        position:0,
+        duration:0
+      };
+    }
+
+    movie.source="url";
+    movie.videoURL=videoURL;
+    movie.manualTitle=manualTitle;
+    movie.manualPosterURL=manualPosterURL;
+    movie.manualBackdropURL=manualBackdropURL;
+    movie.detectedFilename=identity.filename||"";
+    movie.detectedTitle=identity.title;
+    movie.detectedYear=identity.year;
+    movie.title=metadata.title||identity.title;
+    movie.year=metadata.year||identity.year||"";
+    movie.overview=metadata.overview||"";
+    movie.tmdbId=metadata.tmdbId||null;
+    movie.rating=metadata.rating||0;
+    movie.genres=metadata.genres||[];
+
+    movie.posterURL=manualPosterURL||metadata.posterURL||"";
+    movie.backdropURL=manualBackdropURL||metadata.backdropURL||"";
+
     await saveMovie(movie);
     closeModal("urlModal");
+    editingURLId=null;
     await refreshLibrary();
-    if (editingURLId) openDetails(movie.id);
-    editingURLId = null;
-  } catch(error) {
+    openDetails(movie.id);
+  }catch(error){
     console.error(error);
-    alert("Could not save this movie.");
+    status.textContent=error.message;
+  }finally{
+    button.disabled=false;
   }
 }
 
-function playMovie(id) {
-  const movie = movies.find(item => item.id === id);
-  if (!movie) return;
+function playMovie(id){
+  const movie=movies.find(item=>item.id===id);
+  if(!movie)return;
 
-  activeMovie = movie;
+  activeMovie=movie;
   closeModal("detailModal");
 
-  const video = document.getElementById("videoPlayer");
+  const video=document.getElementById("videoPlayer");
   video.pause();
   video.removeAttribute("src");
 
-  if (movie.source === "url") {
-    video.src = movie.videoURL;
-    document.getElementById("playerStatus").textContent = "STREAMING FROM URL";
-  } else {
-    video.src = URL.createObjectURL(movie.file);
-    document.getElementById("playerStatus").textContent = "LOCAL MEDIA";
+  if(movie.source==="url"){
+    video.src=movie.videoURL;
+    document.getElementById("playerStatus").textContent="STREAMING FROM URL";
+  }else{
+    video.src=URL.createObjectURL(movie.file);
+    document.getElementById("playerStatus").textContent="LOCAL MEDIA";
   }
 
-  document.getElementById("playerTitle").textContent = movie.title;
+  document.getElementById("playerTitle").textContent=movie.title;
   document.getElementById("playerModal").classList.add("show");
-
   video.load();
 
-  video.onloadedmetadata = () => {
-    if (movie.position > 0 && movie.duration > 0 &&
-        movie.position < video.duration - 5) {
-      video.currentTime = movie.position;
-    }
-    video.play().catch(() => {});
+  video.onloadedmetadata=()=>{
+    if(movie.position>0&&movie.duration>0&&movie.position<video.duration-5)
+      video.currentTime=movie.position;
+    video.play().catch(()=>{});
   };
 
-  video.onerror = () => {
-    document.getElementById("playerStatus").textContent =
-      "Unable to play this video. Check the URL and format.";
+  video.onerror=()=>{
+    document.getElementById("playerStatus").textContent="Unable to play this video. Check the URL, format, and host permissions.";
   };
 }
 
-async function saveProgress() {
-  if (!activeMovie) return;
-  const video = document.getElementById("videoPlayer");
-  if (!Number.isFinite(video.currentTime)) return;
-
-  activeMovie.position = video.currentTime;
-  activeMovie.duration = Number.isFinite(video.duration) ? video.duration : 0;
-
-  if (video.ended) {
-    activeMovie.watched = true;
-    activeMovie.position = 0;
+async function saveProgress(){
+  if(!activeMovie)return;
+  const video=document.getElementById("videoPlayer");
+  if(!Number.isFinite(video.currentTime))return;
+  activeMovie.position=video.currentTime;
+  activeMovie.duration=Number.isFinite(video.duration)?video.duration:0;
+  if(video.ended){
+    activeMovie.watched=true;
+    activeMovie.position=0;
   }
-
   await saveMovie(activeMovie);
 }
 
-async function closePlayer() {
-  const video = document.getElementById("videoPlayer");
-  if (activeMovie && !video.ended) await saveProgress();
-
+async function closePlayer(){
+  const video=document.getElementById("videoPlayer");
+  if(activeMovie&&!video.ended)await saveProgress();
   video.pause();
   video.removeAttribute("src");
   video.load();
-
   document.getElementById("playerModal").classList.remove("show");
-  activeMovie = null;
-
+  activeMovie=null;
   await refreshLibrary();
 }
 
-document.getElementById("videoPlayer").addEventListener("timeupdate",() => {
-  if (!activeMovie) return;
-  const video = document.getElementById("videoPlayer");
-  const progress = video.duration ? video.currentTime/video.duration*100 : 0;
-  document.getElementById("playerProgress").style.width = progress+"%";
-
-  if (Math.floor(video.currentTime) % 10 === 0) saveProgress();
+document.getElementById("videoPlayer").addEventListener("timeupdate",()=>{
+  if(!activeMovie)return;
+  const video=document.getElementById("videoPlayer");
+  const progress=video.duration?video.currentTime/video.duration*100:0;
+  document.getElementById("playerProgress").style.width=progress+"%";
+  if(Math.floor(video.currentTime)%10===0)saveProgress();
 });
 
-document.getElementById("videoPlayer").addEventListener("ended",async () => {
-  if (!activeMovie) return;
-  activeMovie.watched = true;
-  activeMovie.position = 0;
-  activeMovie.duration = 0;
+document.getElementById("videoPlayer").addEventListener("ended",async()=>{
+  if(!activeMovie)return;
+  activeMovie.watched=true;
+  activeMovie.position=0;
+  activeMovie.duration=0;
   await saveMovie(activeMovie);
   await refreshLibrary();
 });
 
-function openSettings() {
-  document.getElementById("tmdbKey").value = localStorage.getItem("st4r_tmdb_key") || "";
+function openSettings(){
+  document.getElementById("tmdbKey").value=localStorage.getItem("st4r_tmdb_key")||"";
   document.getElementById("settingsModal").classList.add("show");
   updateStorageInfo();
 }
 
-function saveSettings() {
+function saveSettings(){
   localStorage.setItem("st4r_tmdb_key",document.getElementById("tmdbKey").value.trim());
   closeModal("settingsModal");
 }
 
-async function updateStorageInfo() {
-  let text = "Browser storage information unavailable.";
-
-  if (navigator.storage && navigator.storage.estimate) {
-    const estimate = await navigator.storage.estimate();
-    const used = (estimate.usage || 0)/1024/1024;
-    const quota = (estimate.quota || 0)/1024/1024;
-    text = `Storage used: ${used.toFixed(1)} MB / ${quota.toFixed(0)} MB`;
+async function updateStorageInfo(){
+  let text="Browser storage information unavailable.";
+  if(navigator.storage?.estimate){
+    const estimate=await navigator.storage.estimate();
+    text=`Storage used: ${((estimate.usage||0)/1048576).toFixed(1)} MB / ${((estimate.quota||0)/1048576).toFixed(0)} MB`;
   }
-
-  document.getElementById("storageInfo").textContent = text;
-  document.getElementById("storageDetail").textContent = text;
+  document.getElementById("storageInfo").textContent=text;
+  document.getElementById("storageDetail").textContent=text;
 }
 
-async function exportMetadata() {
-  const data = movies.map(movie => ({
-    id:movie.id,
-    title:movie.title,
-    source:movie.source,
-    videoURL:movie.source === "url" ? movie.videoURL : undefined,
-    posterURL:movie.source === "url" ? movie.posterURL : undefined,
-    backdropURL:movie.source === "url" ? movie.backdropURL : undefined,
-    fileName:movie.fileName,
-    filePath:movie.filePath,
-    watched:movie.watched,
-    position:movie.position,
-    year:movie.year,
-    added:movie.added
+function exportMetadata(){
+  const data=movies.map(movie=>({
+    id:movie.id,title:movie.title,source:movie.source,
+    videoURL:movie.source==="url"?movie.videoURL:undefined,
+    posterURL:movie.posterURL,backdropURL:movie.backdropURL,
+    fileName:movie.fileName,filePath:movie.filePath,
+    watched:movie.watched,position:movie.position,
+    year:movie.year,added:movie.added,tmdbId:movie.tmdbId
   }));
-
-  const blob = new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "st4r-cinema-library.json";
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement("a");
+  link.href=url;
+  link.download="st4r-cinema-library.json";
   link.click();
-  URL.revokeObjectURL(link.href);
+  URL.revokeObjectURL(url);
 }
 
-async function clearLibrary() {
-  if (!confirm("Permanently delete every movie from this browser's ST4R Cinema library?")) return;
-
-  const tx = db.transaction(STORE,"readwrite");
+async function clearLibrary(){
+  if(!confirm("Permanently delete every movie from this browser's library?"))return;
+  const tx=db.transaction(STORE,"readwrite");
   tx.objectStore(STORE).clear();
-
-  await new Promise((resolve,reject) => {
-    tx.oncomplete = resolve;
-    tx.onerror = () => reject(tx.error);
+  await new Promise((resolve,reject)=>{
+    tx.oncomplete=resolve;
+    tx.onerror=()=>reject(tx.error);
   });
-
   revokeArtwork();
   closeModal("settingsModal");
   await refreshLibrary();
 }
 
-async function initialize() {
-  try {
-    db = await openDB();
+async function initialize(){
+  try{
+    db=await openDB();
     await refreshLibrary();
-
-    if (navigator.storage && navigator.storage.persist) {
-      navigator.storage.persist().catch(() => {});
-    }
-  } catch(error) {
+    if(navigator.storage?.persist)navigator.storage.persist().catch(()=>{});
+  }catch(error){
     console.error(error);
     alert("ST4R Cinema could not initialize its browser database.");
   }
