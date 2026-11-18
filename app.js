@@ -5,6 +5,7 @@ const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
 const STORE_KEY = "st4r-cinema.v1";
 const IMG = "https://image.tmdb.org/t/p";
+const VIDSRC_MOVIE_URL = (tmdbId) => `https://vidsrc.to/embed/movie/${encodeURIComponent(tmdbId)}`;
 
 const state = {
   movies: [],
@@ -93,7 +94,7 @@ function metaLine(movie) {
   const bits = [];
   if (movie.year) bits.push(movie.year);
   if (movie.rating) bits.push(`★ ${movie.rating}`);
-  bits.push(movie.url ? "Stream link" : "No link yet");
+  bits.push(movie.url ? "Direct stream" : movie.tmdbId ? "Vidsrc" : "No link yet");
   return bits;
 }
 
@@ -312,7 +313,7 @@ function cardHtml(movie, opts = {}) {
       <div class="poster">
         <div class="fallback">${esc(movie.title)}</div>
         ${poster}
-        <span class="badge">${movie.url ? "Link" : "Unlinked"}</span>
+        <span class="badge">${movie.url ? "Direct" : movie.tmdbId ? "Vidsrc" : "Unlinked"}</span>
         <span class="hint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5l10 6.5-10 6.5z" fill="currentColor" stroke="none"/></svg>${pct ? "Resume" : "Play"}</span>
         ${pct ? `<div class="progress"><span style="width:${pct.toFixed(2)}%"></span></div>` : ""}
       </div>
@@ -439,8 +440,8 @@ function render() {
       <div class="hero-meta">
         ${featured.year ? `<span>${featured.year}</span><span class="dot"></span>` : ""}
         ${featured.rating ? `<span>★ ${featured.rating}</span><span class="dot"></span>` : ""}
-        <span class="chip-static">${featured.url ? "LINK" : "NO LINK"}</span>
-        <span>${featured.url ? "Direct stream" : "Add a stream link"}</span>
+        <span class="chip-static">${featured.url ? "DIRECT" : featured.tmdbId ? "VIDSRC" : "NO LINK"}</span>
+        <span>${featured.url ? "Direct stream" : featured.tmdbId ? "Vidsrc stream" : "Add a stream link"}</span>
         ${featuredPct ? `<span class="dot"></span><span>${minutesLeft(featured)} min left</span>` : ""}
       </div>
       ${featured.overview ? `<p>${esc(featured.overview)}</p>` : ""}
@@ -469,8 +470,11 @@ function render() {
 /* ---------------------------------------------------------------- player */
 
 let playerMovie = null;
+let currentPlayerType = null;
+let playerFrame = null;
 
 function saveProgress() {
+  if (currentPlayerType === "vidsrc") return;
   if (!playerMovie || !videoEl.duration || !isFinite(videoEl.duration)) return;
   const position = videoEl.currentTime;
   const duration = videoEl.duration;
@@ -482,9 +486,9 @@ function saveProgress() {
 }
 
 function play(movie) {
-  if (!movie.url) {
+  if (!movie.url && !movie.tmdbId) {
     openDetail(movie.id);
-    toast("Add a stream link for this film first.", 4200);
+    toast("Add a stream link or match this film with TMDB first.", 4200);
     return;
   }
   const player = $("#player");
@@ -494,38 +498,67 @@ function play(movie) {
   playerMovie = movie;
   $("#player-title").textContent = `${movie.title}${movie.year ? ` · ${movie.year}` : ""}`;
   msg.hidden = true;
-  videoEl.onerror = () => {
-    msg.hidden = false;
-    msg.textContent =
-      "This link didn't load. Check that it points straight at a video file and allows playback here.";
-  };
-  videoEl.src = movie.url;
 
-  if (start > 5) {
-    videoEl.addEventListener(
-      "loadedmetadata",
-      () => {
-        if (start < (videoEl.duration || Infinity) * 0.95) {
-          videoEl.currentTime = start;
-          toast(`Resumed at ${fmtClock(start)}`, 2400);
-        }
-      },
-      { once: true },
-    );
+  if (!movie.url && movie.tmdbId) {
+    currentPlayerType = "vidsrc";
+    videoEl.pause();
+    videoEl.removeAttribute("src");
+    videoEl.load();
+
+    if (playerFrame) playerFrame.remove();
+    playerFrame = document.createElement("iframe");
+    playerFrame.src = VIDSRC_MOVIE_URL(movie.tmdbId);
+    playerFrame.title = `${movie.title} player`;
+    playerFrame.allow = "autoplay; fullscreen; picture-in-picture; encrypted-media";
+    playerFrame.allowFullscreen = true;
+    playerFrame.referrerPolicy = "origin";
+    playerFrame.style.cssText = "position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;";
+    player.style.position = "relative";
+    player.appendChild(playerFrame);
+  } else {
+    currentPlayerType = "video";
+    if (playerFrame) {
+      playerFrame.remove();
+      playerFrame = null;
+    }
+
+    videoEl.onerror = () => {
+      msg.hidden = false;
+      msg.textContent =
+        "This link didn't load. Check that it points straight at a video file and allows playback here.";
+    };
+    videoEl.src = movie.url;
+
+    if (start > 5) {
+      videoEl.addEventListener(
+        "loadedmetadata",
+        () => {
+          if (start < (videoEl.duration || Infinity) * 0.95) {
+            videoEl.currentTime = start;
+            toast(`Resumed at ${fmtClock(start)}`, 2400);
+          }
+        },
+        { once: true },
+      );
+    }
+
+    videoEl.play().catch(() => {});
   }
 
   player.hidden = false;
   document.body.style.overflow = "hidden";
-  videoEl.play().catch(() => {});
   const closeBtn = $("#player-close");
   if (closeBtn) setFocus(closeBtn, false);
-}
-
-function closePlayer() {
+}function closePlayer() {
   saveProgress();
   videoEl.pause();
   videoEl.removeAttribute("src");
   videoEl.load();
+  if (playerFrame) {
+    playerFrame.remove();
+    playerFrame = null;
+  }
+  currentPlayerType = null;
   $("#player").hidden = true;
   $("#player-msg").hidden = true;
   playerMovie = null;
@@ -536,7 +569,7 @@ function closePlayer() {
 }
 
 videoEl.addEventListener("timeupdate", () => {
-  if (!playerMovie) return;
+  if (!playerMovie || currentPlayerType === "vidsrc") return;
   if (!videoEl.lastSave || Date.now() - videoEl.lastSave > 7000) {
     videoEl.lastSave = Date.now();
     saveProgress();
@@ -544,7 +577,7 @@ videoEl.addEventListener("timeupdate", () => {
 });
 videoEl.addEventListener("pause", () => saveProgress());
 videoEl.addEventListener("ended", () => {
-  if (!playerMovie) return;
+  if (!playerMovie || currentPlayerType === "vidsrc") return;
   const movie = state.movies.find((m) => m.id === playerMovie.id);
   if (movie) {
     delete movie.progress;
@@ -764,7 +797,7 @@ function tmdbTabHtml() {
         <input id="t-q" data-nav placeholder="Search TMDB for a film" spellcheck="false" />
         <button class="btn ghost small" data-nav id="t-go">Search</button>
       </div>
-      <div class="hintline">Pick a film to add its poster and details, then attach a stream link from its page.</div>
+      <div class="hintline">Pick a film to add its poster and details. TMDB matches will play through Vidsrc automatically.</div>
     </div>
     <div class="match-list" id="t-results"><div class="browser-empty">${state.tmdbKey ? "Search for a title." : "Add a TMDB key in settings to search."}</div></div>`;
 }
@@ -817,7 +850,7 @@ function wireTmdbTab(panel, body) {
           closeModal();
           render();
           openDetail(movie.id);
-          toast("Added — paste a stream link for it.", 5000);
+          toast("Added — this title will play through Vidsrc.", 5000);
         };
       });
     } catch (err) {
@@ -975,7 +1008,7 @@ function openDetail(id) {
         <div class="detail-meta">
           ${movie.year ? `<span>${movie.year}</span><span class="dot"></span>` : ""}
           ${movie.rating ? `<span class="star">★ ${movie.rating}</span><span class="dot"></span>` : ""}
-          <span>${movie.url ? "Stream link" : "No link yet"}</span>
+          <span>${movie.url ? "Direct stream" : movie.tmdbId ? "Vidsrc stream" : "No link yet"}</span>
           ${pct ? `<span class="dot"></span><span>${left} min left</span>` : ""}
         </div>
         <p class="detail-overview">${esc(movie.overview) || "No synopsis yet. Use “Fix artwork” to pick the right TMDB match."}</p>
@@ -983,7 +1016,7 @@ function openDetail(id) {
       </div>
     </div>
     <div class="detail-actions">
-      <button class="btn primary" data-nav id="d-play" ${movie.url ? "" : "disabled"}>
+      <button class="btn primary" data-nav id="d-play" ${movie.url || movie.tmdbId ? "" : "disabled"}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5l10 6.5-10 6.5z" fill="currentColor" stroke="none"/></svg>
         ${pct ? `Resume · ${left} min left` : "Play"}
       </button>
@@ -997,8 +1030,7 @@ function openDetail(id) {
         <button class="btn ghost small" data-nav id="d-url-save">Save</button>
       </div>
     </div>
-    <div class="detail-folders">
-      <span class="flabel">Folder</span>
+    <div class="detail-folders">      <span class="flabel">Folder</span>
       <div class="chips">${chips}</div>
       <div class="folder-form" id="d-folder-form" hidden>
         <input id="d-folder-name" data-nav placeholder="New folder name" spellcheck="false" />
@@ -1008,7 +1040,7 @@ function openDetail(id) {
   `);
 
   $("#d-play", panel).onclick = () => {
-    if (!movie.url) return toast("Paste a stream link below first.");
+    if (!movie.url && !movie.tmdbId) return toast("Paste a stream link or match this film with TMDB first.");
     closeModal();
     play(movie);
   };
@@ -1021,7 +1053,7 @@ function openDetail(id) {
     saveStore();
     render();
     openDetail(movie.id);
-    toast(value ? "Stream link saved." : "Stream link cleared.");
+    toast(value ? "Direct stream link saved." : "Direct stream link cleared. Vidsrc will be used if this movie has a TMDB ID.");
   };
   $("#d-url-save", panel).onclick = saveUrl;
   $("#d-url", panel).addEventListener("keydown", (event) => {
@@ -1081,7 +1113,7 @@ async function openMatch(movie) {
     <div class="modal-head">
       <div>
         <h2>Match artwork</h2>
-        <p>Search TMDB for the right film, then pick it to replace the poster, backdrop and synopsis.</p>
+        <p>Search TMDB for the right film, then pick it to replace the poster, backdrop, synopsis and Vidsrc movie ID.</p>
       </div>
       ${X_BTN}
     </div>
@@ -1136,7 +1168,7 @@ async function openMatch(movie) {
           closeModal();
           render();
           openDetail(movie.id);
-          toast("Artwork updated.");
+          toast("Artwork and Vidsrc match updated.");
         };
       });
     } catch (err) {
@@ -1186,7 +1218,9 @@ $("#empty-settings").onclick = openSettings;
 $("#player-close").onclick = closePlayer;
 
 videoEl.addEventListener("click", () => {
-  $("#player").classList.toggle("show-bar");
+  if (currentPlayerType !== "vidsrc") {
+    $("#player").classList.toggle("show-bar");
+  }
 });
 
 /* --------------------------------------------------------- key handling */
@@ -1216,6 +1250,8 @@ document.addEventListener("keydown", (event) => {
   }
 
   if (playerOpen) {
+    if (currentPlayerType === "vidsrc") return;
+
     if (event.key === " " || event.key === "Enter" || event.key === "k") {
       event.preventDefault();
       if (videoEl.paused) videoEl.play().catch(() => {});
